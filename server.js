@@ -66,7 +66,7 @@ app.get('/qry', function(req, res) {
   // console.log(res.query);
   params = query.query;
   console.log(params.email);
-  res.jsonp({ "beacon_major": "9999", "beacon_minor": "1111" });
+  res.jsonp({ "beacon_major": "33613", "beacon_minor": "1285" });
 });
 
 server.listen(process.env.PORT || 9999, function() {
