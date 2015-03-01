@@ -31,29 +31,42 @@ app.use(function (req, res, next) {
 });
 
 
-//========================================== mocking to delete
-//mocking function to get data from DB server
-app.get('/song',function(req,res){
-  res.json(MOCK_SONGS);
-  console.log(MOCK_SONGS);
-});
-
-app.get('/spotify',function(req,res){
-
-});
-
-//========================================== end of mocking
-
 function extractParams(req){
   query = (url.parse(req.url,true));
   return query.query;
 };
 
+//========================================== mocking to delete
+//mocking function to get data from DB server
+//DB reply with json to forward to spotify
+app.get('/song',function(req,res){
+  res.json(MOCK_SONGS);
+  console.log(MOCK_SONGS);
+});
+
+//called in case of in/out after DB contact
+app.get('/spotify',function(req,res){
+  params=extractParams(req);
+  console.log('Spotify is getting data');
+  res.json({success:200,comment:'happy and updated'});
+});
+
+//initial DB reply with email details 
+//replying with beacon numbers 
+app.get('/party_details',function(req,res){
+  params = extractParams(req);
+  console.log(params);
+  console.log('DB is getting email details and replies with beacon dets:'+params.email);
+  res.json({ "beacon_major": "33613", "beacon_minor": "120" });
+});
+
+//========================================== end of mocking
+
+
+
 function jsonCall(object,path,callback) {
-  console.log("trying to hit Matteo");
   request.get(path,object, function (error,response,body){
     if (!error && response.statusCode == 200) {
-      console.log("Sent To Matteo");
       reply = JSON.parse(response.body);
       callback(reply); //to check
     } else
@@ -78,6 +91,10 @@ app.get('/in', function(req, res) {
   jsonCall(params,BLUE_PATH,function(response){  //calling db with params to get ids
     console.log(response.songs_ids);
     console.log(response.beacon);
+    //modification of params for spotify
+    jsonCall(params,SPOTIFY_PATH,function(response){
+      console.log(response);
+    });
   });
 
 });
@@ -94,7 +111,9 @@ app.get('/qry', function(req, res) {
   console.log(params.email);
   //getting info from DB and forwarding to mobile client
   //to do contact DB -- first mock it
-  res.jsonp({ "beacon_major": "33613", "beacon_minor": "1285" });
+  jsonCall({email:params.email},BLUE_PATH_INITIAL_QRY,function(response){
+    res.jsonp(response); //sending back to the mobile
+
 });
 
 server.listen(process.env.PORT || 9999, function() {
