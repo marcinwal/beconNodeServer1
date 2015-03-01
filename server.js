@@ -47,6 +47,7 @@ app.get('/song',function(req,res){
 //called in case of in/out after DB contact
 app.get('/spotify',function(req,res){
   params=extractParams(req);
+  console.log(params);
   console.log('Spotify is getting data');
   res.json({success:200,comment:'happy and updated'});
 });
@@ -111,9 +112,9 @@ app.get('/qry', function(req, res) {
   console.log(params.email);
   //getting info from DB and forwarding to mobile client
   //to do contact DB -- first mock it
-  jsonCall({email:params.email},BLUE_PATH_INITIAL_QRY,function(response){
+  jsonCall(params,BLUE_PATH_INITIAL_QRY,function(response){
     res.jsonp(response); //sending back to the mobile
-
+  });
 });
 
 server.listen(process.env.PORT || 9999, function() {
